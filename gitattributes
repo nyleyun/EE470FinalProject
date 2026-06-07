@@ -1,0 +1,6 @@
+*.slx binary
+*.sldd binary
+*.slreqx binary
+*.mldatx binary
+*.mat binary
+*.mlx binary
