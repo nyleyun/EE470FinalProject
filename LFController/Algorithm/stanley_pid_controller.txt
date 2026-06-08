@@ -1,0 +1,107 @@
+function [accelCmd, steeringCmd] = StanleyPIDController(setVel, timeGap, relDist, relVel, egoVel, curvature, lateralDev, relYaw)
+%#codegen
+
+% Initialize outputs so Simulink can infer size and type
+accelCmd = 0.0;
+steeringCmd = 0.0;
+
+% Constants
+Ts = 0.1;
+
+maxSteer = 0.26;
+minSteer = -0.26;
+
+maxAccel = 2.0;
+minAccel = -3.0;
+
+defaultSpacing = 10.0;
+wheelbase = 2.8;
+
+% Stanley gains
+kStanley = 1.4;
+softening = 0.5;
+kCurvFF = 1.8;
+
+% Longitudinal controller gains
+KpVel = 0.45;
+KiVel = 0.05;
+KdVel = 0.0;
+
+KpGap = 0.15;
+KrelVel = 0.35;
+
+% Persistent PID states
+persistent intVelErr prevVelErr
+
+if isempty(intVelErr)
+    intVelErr = 0.0;
+    prevVelErr = 0.0;
+end
+
+% Protect against divide-by-small velocity
+v = egoVel;
+if v < 0.1
+    v = 0.1;
+end
+
+% ============================================================
+% Lateral Stanley controller
+% ============================================================
+
+
+steerFF = atan(wheelbase * curvature);
+
+steerFB = -(relYaw + atan((kStanley * lateralDev) / (v + softening)));
+
+steeringRaw = kCurvFF * steerFF + steerFB;
+
+if steeringRaw > maxSteer
+    steeringCmd = maxSteer;
+elseif steeringRaw < minSteer
+    steeringCmd = minSteer;
+else
+    steeringCmd = steeringRaw;
+end
+
+% ============================================================
+% Longitudinal PID / ACC controller
+% ============================================================
+
+velErr = setVel - egoVel;
+
+desiredGap = defaultSpacing + timeGap * egoVel;
+gapErr = relDist - desiredGap;
+
+leadVehicleDetected = false;
+
+if relDist > 0.5
+    if relDist < 120.0
+        leadVehicleDetected = true;
+    end
+end
+
+if leadVehicleDetected
+    accelRaw = KpVel * velErr + KpGap * gapErr + KrelVel * relVel;
+else
+    intVelErr = intVelErr + Ts * velErr;
+
+    if intVelErr > 10.0
+        intVelErr = 10.0;
+    elseif intVelErr < -10.0
+        intVelErr = -10.0;
+    end
+
+    dVelErr = (velErr - prevVelErr) / Ts;
+
+    accelRaw = KpVel * velErr + KiVel * intVelErr + KdVel * dVelErr;
+end
+
+prevVelErr = velErr;
+
+if accelRaw > maxAccel
+    accelCmd = maxAccel;
+elseif accelRaw < minAccel
+    accelCmd = minAccel;
+else
+    accelCmd = accelRaw;
+end
