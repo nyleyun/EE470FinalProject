@@ -2,7 +2,7 @@ Implementation and Evaluation of Autonomous Vehicle Highway Lane Following Syste
 
 Andrew Daouda, Nyle Yun
 
-Video Presentation: [Clickable Text](https://youtu.be/RJuB0YfRQS8)
+Video Presentation: [Final Project Video Link](https://youtu.be/RJuB0YfRQS8)
 
 This project is based on this example from MATLAB: https://www.mathworks.com/help/driving/ug/highway-lane-following.html#d127e58565
 
