@@ -6,8 +6,10 @@ Video Presentation: [Final Project Video Link](https://youtu.be/RJuB0YfRQS8)
 
 This project is based on this example from MATLAB: https://www.mathworks.com/help/driving/ug/highway-lane-following.html#d127e58565
 
-The repository has two branches: main, stanley_controller
-main is the original example project from MATLAB and stanley_controller is the modified version with our Stanley/PID controller implemented
+The repository has three branches: main, DBSCAN, stanley_controller
+main: is the original example project from MATLAB
+stanley_controller: is the modified version with our Stanley/PID controller implemented
+DBSCAN: is the version that contains both the Stanley/PID controller and DBSCAN algorithms
 
 The simulation results are stored in the "sim_results_default" and "sim_results_stanley" folders
 
